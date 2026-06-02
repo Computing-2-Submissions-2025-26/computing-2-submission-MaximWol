@@ -11,64 +11,105 @@
     <link rel="stylesheet" href="default.css">
 
     <script type="module" src="main.js"></script>
+
 </head>
 
 <body>
 
-    <h1>Mastermind</h1>
+    <div id="code-setter-screen" class="screen red-theme">
 
-    <h2>Set Secret Code</h2>
+        <h1>CODE SETTER</h1>
 
-    <div id="secret-code-inputs">
+        <p>Create the secret code</p>
 
-        <input id="secret-1" type="text" placeholder="Colour 1">
+        <div id="secret-preview" class="peg-row"></div>
 
-        <input id="secret-2" type="text" placeholder="Colour 2">
+        <div class="colour-palette">
 
-        <input id="secret-3" type="text" placeholder="Colour 3">
+            <button class="colour-button red" data-colour="red"></button>
 
-        <input id="secret-4" type="text" placeholder="Colour 4">
+            <button class="colour-button green" data-colour="green"></button>
 
-    </div>
+            <button class="colour-button blue" data-colour="blue"></button>
 
-    <button id="set-secret-button">
-        Set Secret Code
-    </button>
+            <button class="colour-button yellow" data-colour="yellow"></button>
 
-    <hr>
+            <button class="colour-button white" data-colour="white"></button>
 
-    <h2>Make Guess</h2>
+            <button class="colour-button black" data-colour="black"></button>
 
-    <p>
-        Attempts Remaining:
-        <span id="attempts-remaining">10</span>
-    </p>
+        </div>
 
-    <div id="guess-inputs">
+        <div class="control-buttons">
 
-        <input id="guess-1" type="text" placeholder="Colour 1">
+            <button id="secret-clear-button">
+                Clear
+            </button>
 
-        <input id="guess-2" type="text" placeholder="Colour 2">
+            <button id="secret-confirm-button">
+                Confirm Secret Code
+            </button>
 
-        <input id="guess-3" type="text" placeholder="Colour 3">
-
-        <input id="guess-4" type="text" placeholder="Colour 4">
+        </div>
 
     </div>
 
-    <button id="submit-guess-button">
-        Submit Guess
-    </button>
+    <div id="transition-screen" class="screen hidden transition-theme">
 
-    <h2>Game Message</h2>
+        <h1>PASS DEVICE TO CODEBREAKER</h1>
 
-    <div id="game-message"></div>
+        <button id="start-game-button">
+            Continue
+        </button>
 
-    <h2>Guess History</h2>
+    </div>
 
-    <div id="guess-history"></div>
+    <div id="code-breaker-screen" class="screen hidden blue-theme">
+
+        <h1>CODE BREAKER</h1>
+
+        <p>
+            Attempts Remaining:
+            <span id="attempts-remaining">10</span>
+        </p>
+
+        <div id="guess-preview" class="peg-row"></div>
+
+        <div class="colour-palette">
+
+            <button class="colour-button red" data-colour="red"></button>
+
+            <button class="colour-button green" data-colour="green"></button>
+
+            <button class="colour-button blue" data-colour="blue"></button>
+
+            <button class="colour-button yellow" data-colour="yellow"></button>
+
+            <button class="colour-button white" data-colour="white"></button>
+
+            <button class="colour-button black" data-colour="black"></button>
+
+        </div>
+
+        <div class="control-buttons">
+
+            <button id="guess-clear-button">
+                Clear
+            </button>
+
+            <button id="submit-guess-button">
+                Submit Guess
+            </button>
+
+        </div>
+
+        <div id="game-message"></div>
+
+        <div id="guess-history"></div>
+
+        <button id="reset-button">RESET GAME</button>
+    </div>
 
 </body>
 
 </html>
-```

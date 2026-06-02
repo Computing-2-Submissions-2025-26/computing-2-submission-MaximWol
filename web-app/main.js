@@ -1,9 +1,30 @@
-import R from "./ramda.js";
-
-
 import Mastermind from "./Mastermind.js";
 
-const game = Mastermind.createGame();
+let game = Mastermind.createGame();
+
+let currentSecretSelection = [];
+
+let currentGuessSelection = [];
+
+const codeSetterScreen = document.getElementById(
+    "code-setter-screen"
+);
+
+const transitionScreen = document.getElementById(
+    "transition-screen"
+);
+
+const codeBreakerScreen = document.getElementById(
+    "code-breaker-screen"
+);
+
+const secretPreview = document.getElementById(
+    "secret-preview"
+);
+
+const guessPreview = document.getElementById(
+    "guess-preview"
+);
 
 const gameMessage = document.getElementById(
     "game-message"
@@ -17,119 +38,248 @@ const guessHistory = document.getElementById(
     "guess-history"
 );
 
-const setSecretButton = document.getElementById(
-    "set-secret-button"
-);
+const renderPegs = (container, colours) => {
 
-const submitGuessButton = document.getElementById(
-    "submit-guess-button"
-);
+    container.innerHTML = "";
 
-const renderGuessHistory = () => {
+    colours.forEach((colour) => {
 
-    guessHistory.innerHTML = "";
+        const peg = document.createElement("div");
 
-    game.guesses.forEach((entry, index) => {
+        peg.classList.add("peg");
 
-        const guessDiv = document.createElement("div");
+        peg.classList.add(colour);
 
-        guessDiv.textContent =
-            `Guess ${index + 1}: ` +
-            `${entry.guess.join(", ")} | ` +
-            `Black Pegs: ${entry.score.blackPegs}, ` +
-            `White Pegs: ${entry.score.whitePegs}`;
-
-        guessHistory.appendChild(guessDiv);
+        container.appendChild(peg);
 
     });
 
 };
 
-setSecretButton.addEventListener("click", () => {
+const addSecretColour = (colour) => {
 
-    const secretCode = [
-        document.getElementById("secret-1").value,
-        document.getElementById("secret-2").value,
-        document.getElementById("secret-3").value,
-        document.getElementById("secret-4").value
-    ];
+    if (currentSecretSelection.length >= 4) {
+        return;
+    }
 
-    try {
+    currentSecretSelection.push(colour);
 
-        Mastermind.setSecretCode(
-            game,
-            secretCode
+    renderPegs(
+        secretPreview,
+        currentSecretSelection
+    );
+
+};
+
+const addGuessColour = (colour) => {
+
+    if (currentGuessSelection.length >= 4) {
+        return;
+    }
+
+    currentGuessSelection.push(colour);
+
+    renderPegs(
+        guessPreview,
+        currentGuessSelection
+    );
+
+};
+
+document.querySelectorAll(
+    "#code-setter-screen .colour-button"
+).forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+        addSecretColour(
+            button.dataset.colour
         );
 
-        gameMessage.textContent =
-            "Secret code set successfully.";
-
-        document.getElementById(
-            "secret-code-inputs"
-        ).style.display = "none";
-
-        setSecretButton.style.display = "none";
-
-    } catch (error) {
-
-        gameMessage.textContent = error.message;
-
-    }
+    });
 
 });
 
-submitGuessButton.addEventListener("click", () => {
+document.querySelectorAll(
+    "#code-breaker-screen .colour-button"
+).forEach((button) => {
 
-    if (game.secretCode.length === 0) {
+    button.addEventListener("click", () => {
+
+        addGuessColour(
+            button.dataset.colour
+        );
+
+    });
+
+});
+
+document.getElementById(
+    "secret-clear-button"
+).addEventListener("click", () => {
+
+    currentSecretSelection = [];
+
+    renderPegs(
+        secretPreview,
+        currentSecretSelection
+    );
+
+});
+
+document.getElementById(
+    "guess-clear-button"
+).addEventListener("click", () => {
+
+    currentGuessSelection = [];
+
+    renderPegs(
+        guessPreview,
+        currentGuessSelection
+    );
+
+});
+
+document.getElementById(
+    "secret-confirm-button"
+).addEventListener("click", () => {
+
+    if (currentSecretSelection.length !== 4) {
 
         gameMessage.textContent =
-            "Set the secret code first.";
+            "Secret code must contain 4 colours.";
 
         return;
 
     }
 
-    const guess = [
-        document.getElementById("guess-1").value,
-        document.getElementById("guess-2").value,
-        document.getElementById("guess-3").value,
-        document.getElementById("guess-4").value
-    ];
+    try {
+
+        Mastermind.setSecretCode(
+            game,
+            currentSecretSelection
+        );
+
+        codeSetterScreen.classList.add(
+            "hidden"
+        );
+
+        transitionScreen.classList.remove(
+            "hidden"
+        );
+
+    } catch (error) {
+
+        gameMessage.textContent =
+            error.message;
+
+    }
+
+});
+
+document.getElementById(
+    "start-game-button"
+).addEventListener("click", () => {
+
+    transitionScreen.classList.add(
+        "hidden"
+    );
+
+    codeBreakerScreen.classList.remove(
+        "hidden"
+    );
+
+});
+
+document.getElementById(
+    "submit-guess-button"
+).addEventListener("click", () => {
+
+    if (currentGuessSelection.length !== 4) {
+
+        gameMessage.textContent =
+            "Guess must contain 4 colours.";
+
+        return;
+
+    }
 
     try {
 
         const score = Mastermind.makeGuess(
             game,
-            guess
+            currentGuessSelection
         );
 
         attemptsRemaining.textContent =
             game.attemptsRemaining;
 
-        gameMessage.textContent =
-            `Black Pegs: ${score.blackPegs}, ` +
+        const guessEntry =
+            document.createElement("div");
+
+        guessEntry.classList.add(
+            "guess-entry"
+        );
+
+        guessEntry.textContent =
+            `Guess: ${currentGuessSelection.join(", ")} | ` +
+            `Black Pegs: ${score.blackPegs} | ` +
             `White Pegs: ${score.whitePegs}`;
 
-        renderGuessHistory();
+        guessHistory.prepend(
+            guessEntry
+        );
+
+        currentGuessSelection = [];
+
+        renderPegs(
+            guessPreview,
+            currentGuessSelection
+        );
 
         if (game.winner === true) {
 
             gameMessage.textContent =
-                "Codebreaker wins!";
+                "CODEBREAKER WINS";
 
-        }
-
-        if (game.winner === false) {
+        } else if (game.winner === false) {
 
             gameMessage.textContent =
-                "Codebreaker loses!";
+                `CODEBREAKER LOSES - Secret code was: ${game.secretCode.join(", ")}`;
+
+        } else {
+
+            gameMessage.textContent =
+                `Black Pegs: ${score.blackPegs}, ` +
+                `White Pegs: ${score.whitePegs}`;
 
         }
 
     } catch (error) {
 
-        gameMessage.textContent = error.message;
+        gameMessage.textContent =
+            error.message;
 
     }
+});
+document.getElementById("reset-button").addEventListener("click", () => {
+
+    game = Mastermind.resetGame();
+
+    currentSecretSelection = [];
+    currentGuessSelection = [];
+
+    renderPegs(secretPreview, []);
+    renderPegs(guessPreview, []);
+
+    guessHistory.innerHTML = "";
+
+    gameMessage.textContent = "";
+
+    attemptsRemaining.textContent = "10";
+
+    codeBreakerScreen.classList.add("hidden");
+    transitionScreen.classList.add("hidden");
+    codeSetterScreen.classList.remove("hidden");
 
 });

@@ -201,4 +201,8 @@ Mastermind.makeGuess = (game, guess) => { // main function to make a guess, call
     return score;
 };
 
+Mastermind.resetGame = () => {
+    return Mastermind.createGame();
+};
+
 export default Object.freeze(Mastermind);

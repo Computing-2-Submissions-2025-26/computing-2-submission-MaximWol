@@ -237,4 +237,37 @@ describe("Mastermind", () => {
             assert.strictEqual(Mastermind.isWinningGuess(game, guess), false);
         });
     });
+    describe("resetGame", () => {
+    it("resets the game state", () => {
+
+    let game = Mastermind.createGame();
+
+    Mastermind.setSecretCode(
+        game,
+        ["red", "blue", "green", "yellow"]
+    );
+
+    Mastermind.makeGuess(
+        game,
+        ["red", "red", "red", "red"]
+    );
+
+    game = Mastermind.resetGame();
+
+    assert.deepEqual(
+        game.secretCode,
+        []
+    );
+
+    assert.equal(
+        game.attemptsRemaining,
+        10
+    );
+
+    assert.equal(
+        game.gameOver,
+        false
+    );
+});
+    });
 });
