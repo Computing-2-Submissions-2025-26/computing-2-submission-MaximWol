@@ -1,9 +1,74 @@
-<!-- In HTML Comments are written like this -->
-<!-- They can all be removed for your apps -->
-<!doctype html> <!-- This first line tells browsers to expect modern standard html 5 -->
-<html lang="en-gb"> <!-- This is indicates the page is written in British English, useful for accessibility -->
-<meta charset="utf-8"> <!-- This indicates how the file is encoded. utf-8 is standard -->
-<title>Your Web-app Title</title> <!-- All pages need a title, this will be displayed in the browser's title bar -->
-<link rel="stylesheet" href="default.css"> <!-- Import style sheet – default.css -->
-<link rel="icon" href="./assets/favicon.png"> <!-- Import 'Favorites Icon' – favicon.png -->
-<script type="module" src="main.js"></script> <!-- Load the main script. Must be type="module". Have only one of these -->
+<!doctype html>
+
+<html lang="en-gb">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <title>Mastermind</title>
+
+    <link rel="stylesheet" href="default.css">
+
+    <script type="module" src="main.js"></script>
+</head>
+
+<body>
+
+    <h1>Mastermind</h1>
+
+    <h2>Set Secret Code</h2>
+
+    <div id="secret-code-inputs">
+
+        <input id="secret-1" type="text" placeholder="Colour 1">
+
+        <input id="secret-2" type="text" placeholder="Colour 2">
+
+        <input id="secret-3" type="text" placeholder="Colour 3">
+
+        <input id="secret-4" type="text" placeholder="Colour 4">
+
+    </div>
+
+    <button id="set-secret-button">
+        Set Secret Code
+    </button>
+
+    <hr>
+
+    <h2>Make Guess</h2>
+
+    <p>
+        Attempts Remaining:
+        <span id="attempts-remaining">10</span>
+    </p>
+
+    <div id="guess-inputs">
+
+        <input id="guess-1" type="text" placeholder="Colour 1">
+
+        <input id="guess-2" type="text" placeholder="Colour 2">
+
+        <input id="guess-3" type="text" placeholder="Colour 3">
+
+        <input id="guess-4" type="text" placeholder="Colour 4">
+
+    </div>
+
+    <button id="submit-guess-button">
+        Submit Guess
+    </button>
+
+    <h2>Game Message</h2>
+
+    <div id="game-message"></div>
+
+    <h2>Guess History</h2>
+
+    <div id="guess-history"></div>
+
+</body>
+
+</html>
+```
