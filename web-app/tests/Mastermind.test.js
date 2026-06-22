@@ -10,7 +10,7 @@ describe("Mastermind", () => {
         });
         it("creates a game with the correct list of valid colours", () => {
             let game = Mastermind.createGame();
-            assert.deepStrictEqual(game.gColours, ["red", "green", "blue", "yellow", "white", "black"]);
+            assert.deepStrictEqual(game.gColours, ["red", "green", "blue", "yellow", "orange", "purple"]);
         });
         it("creates a game with an empty secret code", () => {
             let game = Mastermind.createGame();
@@ -39,7 +39,7 @@ describe("Mastermind", () => {
             for (let i = 0; i < 10; i += 1) {
                 const result = Mastermind.makeGuess(
                     game,
-                    ["white", "white", "white", "white"]
+                    ["orange", "orange", "orange", "orange"]
                 );
                 game = result.game;
             }
@@ -116,7 +116,7 @@ describe("Mastermind", () => {
             let game = Mastermind.createGame();
             const code = ["red", "green", "blue", "yellow"];
             game = Mastermind.setSecretCode(game, code);
-            const guess = ["white", "white", "white", "white"];
+            const guess = ["orange", "orange", "orange", "orange"];
             const score = Mastermind.scoreGuess(game, guess);
             assert.deepStrictEqual(score, {blackPegs: 0, whitePegs: 0});
         });
@@ -183,7 +183,7 @@ describe("Mastermind", () => {
             for (let i = 0; i < 10; i += 1) {
                 const result = Mastermind.makeGuess(
                     game,
-                    ["white", "white", "white", "white"]
+                    ["orange", "orange", "orange", "orange"]
                 );
                 game = result.game;
                 score = result.score;
@@ -192,16 +192,16 @@ describe("Mastermind", () => {
             assert.strictEqual(game.attemptsMade, 10);
             assert.strictEqual(game.attemptsRemaining, 0);
             assert.deepStrictEqual(game.guesses, [
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}},
-                {guess: ["white", "white", "white", "white"], score: {blackPegs: 0, whitePegs: 0}}
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}},
+                {guess: ["orange", "orange", "orange", "orange"], score: {blackPegs: 0, whitePegs: 0}}
             ]);
             assert.strictEqual(game.winner, false);
         });
@@ -231,7 +231,7 @@ describe("Mastermind", () => {
             for (let i = 0; i < 10; i += 1) {
                 const result = Mastermind.makeGuess(
                     game,
-                    ["white", "white", "white", "white"]
+                    ["orange", "orange", "orange", "orange"]
                 );
                 game = result.game;
             }

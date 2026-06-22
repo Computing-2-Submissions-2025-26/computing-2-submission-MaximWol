@@ -1,187 +1,339 @@
-#top-bar {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 10px;
-    z-index: 100;
-}
-
-#rules-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-}
-
-#rules-overlay.hidden {
-    display: none;
-}
-
-#rules-panel {
-    background: #1a1a1a;
-    border: 2px solid white;
-    border-radius: 12px;
-    padding: 30px 40px;
-    max-width: 500px;
-}
-
-#rules-panel h2 {
-    margin-top: 0;
-}
-
-#rules-panel ul {
-    line-height: 1.6;
-    padding-left: 20px;
-}
-
-#rules-panel li {
-    margin-bottom: 10px;
-}
-
-/* Colourblind labels: centre text inside buttons and pegs */
-.colour-button,
-.peg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.colour-label {
-    display: none;
-    font-weight: bold;
-    pointer-events: none;
-}
-
-body.colourblind .colour-label {
-    display: block;
-}
-
-.colour-button .colour-label {
-    font-size: 0.85rem;
-}
-
-.peg .colour-label {
-    font-size: 0.6rem;
-}
-
-/* Text contrast per colour */
-.yellow .colour-label,
-.white .colour-label {
-    color: black;
-}
-
-.red .colour-label,
-.green .colour-label,
-.blue .colour-label,
-.black .colour-label {
-    color: white;
-}
-
 body {
     margin: 0;
+    background: #f5f3ee;
+    color: #222;
     font-family: Arial, sans-serif;
-    background-color: #111111;
-    color: white;
 }
+
+.hidden {
+    display: none !important;
+}
+
+/* Brand */
+
+#brand {
+    position: fixed;
+
+    top: 20px;
+    left: 20px;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+
+    letter-spacing: 0.06em;
+
+    color: #2a2a2a;
+
+    z-index: 1000;
+}
+
+/* Top Bar */
+
+#top-bar {
+    position: fixed;
+
+    top: 20px;
+    right: 20px;
+
+    display: flex;
+    gap: 10px;
+
+    z-index: 1000;
+}
+
+/* Screens */
 
 .screen {
     min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
     padding: 40px;
     box-sizing: border-box;
 }
 
-.red-theme {
-    background: linear-gradient(135deg, #2b0000, #550000);
-}
-
-.blue-theme {
-    background: linear-gradient(135deg, #001133, #003366);
-}
-
-.transition-theme {
-    background: black;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.hidden {
-    display: none;
-}
+/* Headings */
 
 h1 {
     font-size: 4rem;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
-.peg-row {
-    display: flex;
-    gap: 15px;
-    margin: 30px 0;
-    min-height: 60px;
+h2 {
+    margin-top: 30px;
 }
 
-.peg {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 3px solid white;
-}
+/* Palette */
 
 .colour-palette {
     display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
+    gap: 15px;
+
+    margin: 25px 0;
+
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .colour-button {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
+
     border-radius: 50%;
-    border: 3px solid white;
+
+    border: 2px solid rgba(0,0,0,0.2);
+
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: bold;
+
     cursor: pointer;
-    transition: transform 0.2s;
+
+    transition: transform 0.15s;
 }
 
 .colour-button:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
-.red { background-color: red; }
-.green { background-color: green; }
-.blue { background-color: blue; }
-.yellow { background-color: yellow; }
-.white { background-color: white; }
-.black { background-color: black; }
-
-.control-buttons {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
+.colour-label {
+    display: none; /* JS-injected spans are no longer used for labelling */
 }
 
-button {
-    padding: 12px 20px;
+/* Colourblind mode: show a letter on every coloured element */
+
+body.colourblind .colour-button::after,
+body.colourblind .peg::after {
+    font-weight: bold;
     font-size: 1rem;
-    border: none;
-    cursor: pointer;
+    color: #fff;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+    pointer-events: none;
 }
 
-#game-message {
-    font-size: 1.5rem;
-    margin-bottom: 30px;
+body.colourblind .red::after { content: "R"; }
+body.colourblind .green::after { content: "G"; }
+body.colourblind .blue::after { content: "B"; }
+body.colourblind .yellow::after { content: "Y"; }
+body.colourblind .orange::after { content: "O"; }
+body.colourblind .purple::after { content: "P"; }
+
+/* Pegs */
+
+.peg-row {
+    display: flex;
+    gap: 12px;
+
+    justify-content: center;
+    align-items: center;
+
+    min-height: 55px;
+
+    margin-bottom: 20px;
+}
+
+.peg {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(0,0,0,0.2);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: bold;
+}
+
+/* Guess Board */
+
+#guess-history {
+    width: 700px;
+    max-width: 90vw;
 }
 
 .guess-entry {
-    margin-bottom: 15px;
-    padding: 15px;
-    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px;
+
+    margin-bottom: 10px;
+
+    background: white;
+
     border-radius: 10px;
+
+    border: 1px solid #ddd;
 }
+
+.board-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Feedback */
+
+.feedback-area {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 12px);
+
+    gap: 4px;
+}
+
+.feedback-peg {
+    width: 12px;
+    height: 12px;
+
+    border-radius: 50%;
+}
+
+.feedback-black {
+    background: black;
+}
+
+.feedback-white {
+    background: white;
+
+    border: 1px solid #888;
+}
+
+/* Buttons */
+
+button:not(.colour-button) {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    letter-spacing: 0.02em;
+
+    color: #2a2a2a;
+    background: #ffffff;
+
+    padding: 12px 22px;
+
+    border: 1px solid #e2ddd2;
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 0 #d9d3c6;
+
+    transition:
+        transform 0.08s ease,
+        box-shadow 0.08s ease,
+        background 0.15s ease;
+}
+
+button:not(.colour-button):hover {
+    background: #fbf9f4;
+}
+
+button:not(.colour-button):active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 #d9d3c6;
+}
+
+/* Primary actions */
+
+#secret-confirm-button,
+#submit-guess-button,
+#start-game-button {
+    color: #fff;
+    background: #2a2a2a;
+
+    border-color: #2a2a2a;
+
+    box-shadow: 0 2px 0 #000;
+}
+
+#secret-confirm-button:hover,
+#submit-guess-button:hover,
+#start-game-button:hover {
+    background: #1c1c1c;
+}
+
+#secret-confirm-button:active,
+#submit-guess-button:active,
+#start-game-button:active {
+    box-shadow: 0 0 0 #000;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+/* Rules Popup */
+
+#rules-overlay,
+#game-over-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 2000;
+}
+
+#rules-panel,
+#game-over-panel {
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 12px;
+
+    max-width: 500px;
+
+    text-align: center;
+}
+
+/* Colours */
+
+.red {
+    background: #d9534f;
+}
+
+.green {
+    background: #5cb85c;
+}
+
+.blue {
+    background: #4285f4;
+}
+
+.yellow {
+    background: #f4d03f;
+}
+
+.orange {
+    background: #f39c12;
+}
+
+.purple {
+    background: #8e44ad;
+}
+

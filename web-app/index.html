@@ -7,68 +7,292 @@
     <script type="module" src="main.js"></script>
 </head>
 <body>
-    <div id="top-bar">
-        <button id="rules-toggle">Rules</button>
-        <button id="colourblind-toggle">Colourblind Mode</button>
+
+    <div id="brand">
+        Mastermind
     </div>
 
-    <div id="rules-overlay" class="hidden">
+    <header id="top-bar">
+
+        <button id="rules-toggle">
+            Rules
+        </button>
+
+        <button id="colourblind-toggle">
+            Colourblind Mode
+        </button>
+
+    </header>
+
+    <!-- Rules -->
+
+    <div
+        id="rules-overlay"
+        class="hidden"
+    >
+
         <div id="rules-panel">
-            <h2>How to Play</h2>
-            <ul>
-                <li>The Code Setter picks a secret code of 4 colours from the 6 available. Repeats are allowed.</li>
-                <li>The Code Breaker has 10 attempts to guess the exact code.</li>
-                <li>After each guess, pegs are awarded:</li>
-                <li><strong>Black peg:</strong> correct colour in the correct position.</li>
-                <li><strong>White peg:</strong> correct colour in the wrong position.</li>
-                <li>The Breaker wins by scoring 4 black pegs. They lose if all 10 attempts run out.</li>
-            </ul>
-            <button id="rules-close-button">Close</button>
+
+            <h2>
+                How To Play
+            </h2>
+
+            <p>
+                The Code Setter creates a hidden
+                sequence of four colours.
+            </p>
+
+            <p>
+                The Code Breaker has ten attempts
+                to guess the sequence.
+            </p>
+
+            <p>
+                Black pegs indicate a correct
+                colour in the correct position.
+            </p>
+
+            <p>
+                White pegs indicate a correct
+                colour in the wrong position.
+            </p>
+
+            <button id="rules-close-button">
+                Close
+            </button>
+
         </div>
+
     </div>
 
-    <div id="code-setter-screen" class="screen red-theme">
-        <h1>CODE SETTER</h1>
-        <p>Create the secret code</p>
-        <div id="secret-preview" class="peg-row"></div>
+    <!-- Win / Lose Popup -->
+
+    <div
+        id="game-over-overlay"
+        class="hidden"
+        role="alertdialog"
+        aria-live="assertive"
+        aria-labelledby="winner-text"
+    >
+
+        <div id="game-over-panel">
+
+            <h2 id="winner-text"></h2>
+
+            <button id="close-game-over">
+                OK
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Code Setter -->
+
+    <main
+        id="code-setter-screen"
+        class="screen"
+    >
+
+        <h1>
+            Code Setter
+        </h1>
+
+        <p>
+            Create a secret code
+        </p>
+
+        <div
+            id="secret-preview"
+            class="peg-row"
+            aria-label="Secret code so far"
+        ></div>
+
         <div class="colour-palette">
-            <button class="colour-button red" data-colour="red"><span class="colour-label">red</span></button>
-            <button class="colour-button green" data-colour="green"><span class="colour-label">green</span></button>
-            <button class="colour-button blue" data-colour="blue"><span class="colour-label">blue</span></button>
-            <button class="colour-button yellow" data-colour="yellow"><span class="colour-label">yellow</span></button>
-            <button class="colour-button white" data-colour="white"><span class="colour-label">white</span></button>
-            <button class="colour-button black" data-colour="black"><span class="colour-label">black</span></button>
+
+            <button
+                class="colour-button red"
+                data-colour="red"
+                aria-label="Red"
+            ></button>
+
+            <button
+                class="colour-button green"
+                data-colour="green"
+                aria-label="Green"
+            ></button>
+
+            <button
+                class="colour-button blue"
+                data-colour="blue"
+                aria-label="Blue"
+            ></button>
+
+            <button
+                class="colour-button yellow"
+                data-colour="yellow"
+                aria-label="Yellow"
+            ></button>
+
+            <button
+                class="colour-button orange"
+                data-colour="orange"
+                aria-label="Orange"
+            ></button>
+
+            <button
+                class="colour-button purple"
+                data-colour="purple"
+                aria-label="Purple"
+            ></button>
+
         </div>
+
         <div class="control-buttons">
-            <button id="secret-clear-button">Clear</button>
-            <button id="secret-confirm-button">Confirm Secret Code</button>
+
+            <button
+                id="secret-clear-button"
+            >
+                Clear
+            </button>
+
+            <button
+                id="secret-confirm-button"
+            >
+                Confirm Secret Code
+            </button>
+
         </div>
-    </div>
 
-    <div id="transition-screen" class="screen hidden transition-theme">
-        <h1>PASS DEVICE TO CODEBREAKER</h1>
-        <button id="start-game-button">Continue</button>
-    </div>
+    </main>
 
-    <div id="code-breaker-screen" class="screen hidden blue-theme">
-        <h1>CODE BREAKER</h1>
-        <p>Attempts Remaining: <span id="attempts-remaining">10</span></p>
-        <div id="guess-preview" class="peg-row"></div>
+    <!-- Transition -->
+
+    <section
+        id="transition-screen"
+        class="screen hidden"
+    >
+
+        <h1>
+            Pass Device
+        </h1>
+
+        <p>
+            Hand the device to the
+            Code Breaker
+        </p>
+
+        <button
+            id="start-game-button"
+        >
+            Continue
+        </button>
+
+    </section>
+
+    <!-- Code Breaker -->
+
+    <main
+        id="code-breaker-screen"
+        class="screen hidden"
+    >
+
+        <h1>
+            Code Breaker
+        </h1>
+
+        <p>
+            Attempts Remaining:
+            <span id="attempts-remaining" aria-live="polite">
+                10
+            </span>
+        </p>
+
+        <h2>
+            Current Guess
+        </h2>
+
+        <div
+            id="guess-preview"
+            class="peg-row"
+            aria-label="Current guess so far"
+        ></div>
+
         <div class="colour-palette">
-            <button class="colour-button red" data-colour="red"><span class="colour-label">red</span></button>
-            <button class="colour-button green" data-colour="green"><span class="colour-label">green</span></button>
-            <button class="colour-button blue" data-colour="blue"><span class="colour-label">blue</span></button>
-            <button class="colour-button yellow" data-colour="yellow"><span class="colour-label">yellow</span></button>
-            <button class="colour-button white" data-colour="white"><span class="colour-label">white</span></button>
-            <button class="colour-button black" data-colour="black"><span class="colour-label">black</span></button>
+
+            <button
+                class="colour-button red"
+                data-colour="red"
+                aria-label="Red"
+            ></button>
+
+            <button
+                class="colour-button green"
+                data-colour="green"
+                aria-label="Green"
+            ></button>
+
+            <button
+                class="colour-button blue"
+                data-colour="blue"
+                aria-label="Blue"
+            ></button>
+
+            <button
+                class="colour-button yellow"
+                data-colour="yellow"
+                aria-label="Yellow"
+            ></button>
+
+            <button
+                class="colour-button orange"
+                data-colour="orange"
+                aria-label="Orange"
+            ></button>
+
+            <button
+                class="colour-button purple"
+                data-colour="purple"
+                aria-label="Purple"
+            ></button>
+
         </div>
+
         <div class="control-buttons">
-            <button id="guess-clear-button">Clear</button>
-            <button id="submit-guess-button">Submit Guess</button>
+
+            <button
+                id="guess-clear-button"
+            >
+                Clear
+            </button>
+
+            <button
+                id="submit-guess-button"
+            >
+                Submit Guess
+            </button>
+
         </div>
-        <div id="game-message"></div>
-        <div id="guess-history"></div>
-        <button id="reset-button">RESET GAME</button>
-    </div>
+
+        <div id="game-message" role="status" aria-live="polite"></div>
+
+        <section>
+
+            <h2>
+                Board
+            </h2>
+
+            <div
+                id="guess-history"
+            ></div>
+
+        </section>
+
+        <button id="reset-button">
+            Reset Game
+        </button>
+
+    </main>
+
 </body>
 </html>

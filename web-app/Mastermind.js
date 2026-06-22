@@ -1,254 +1,251 @@
 import R from "./ramda.js";
-
 /**
- * Mastermind game module.
- * @module Mastermind
- */
-
-const Mastermind = Object.create(null); // creates object to hold exported functions
-
-
-/**
- * Creates and returns a new Mastermind game state object.
+ * Mastermind.js is a module to model and play "Mastermind" games.
+ * https://en.wikipedia.org/wiki/Mastermind_(board_game)
  *
- * @memberof module:Mastermind
- * @returns {object} A new game state object with default values.
+ * A game is represented by a single immutable state object. Every exported
+ * function is pure: it derives information from a state or returns a new
+ * state, and never mutates its arguments.
+ * @namespace Mastermind
+ * @author Student
+ * @version 2025/26
  */
-Mastermind.createGame = function () { // initialises game state
+const Mastermind = Object.create(null);
+
+/**
+ * A Colour is one of the six pegs a code or guess can be made from.
+ * @memberof Mastermind
+ * @typedef {("red" | "green" | "blue" | "yellow" | "orange" | "purple")} Colour
+ */
+
+/**
+ * A Score is the feedback given for a guess.
+ * @memberof Mastermind
+ * @typedef {object} Score
+ * @property {number} blackPegs The number of colours that are correct and in
+ *     the correct position.
+ * @property {number} whitePegs The number of colours that are present in the
+ *     code but in the wrong position.
+ */
+
+/**
+ * A Game is the complete, immutable state of a single Mastermind game.
+ * @memberof Mastermind
+ * @typedef {object} Game
+ * @property {number} attemptsMade How many guesses have been scored.
+ * @property {number} attemptsRemaining How many guesses are still allowed.
+ * @property {number} codeLength The number of pegs in the code.
+ * @property {Mastermind.Colour[]} gColours The colours a code may use.
+ * @property {object[]} guesses The history of {guess, score} entries.
+ * @property {Mastermind.Colour[]} secretCode The code being guessed.
+ * @property {(boolean | null)} winner `true` if the code breaker has won,
+ *     `false` if they have lost, or `null` while the game is ongoing.
+ */
+
+/**
+ * Create a new, empty game with default settings:
+ * a four peg code, ten attempts, and six available colours.
+ * @memberof Mastermind
+ * @function
+ * @returns {Mastermind.Game} A new game ready for a secret code to be set.
+ */
+Mastermind.createGame = function () {
     return {
-        gColours: ["red", "green", "blue", "yellow", "white", "black"],
-        codeLength: 4,
         attemptsMade: 0,
         attemptsRemaining: 10,
-        secretCode: [],
+        codeLength: 4,
+        gColours: ["red", "green", "blue", "yellow", "orange", "purple"],
         guesses: [],
-        winner: null, //True if guesser wins, false if guesser loses, null if game is ongoing
+        secretCode: [],
+        winner: null
     };
-
 };
 
 /**
- * Validates that a code is in a valid form.
- *
- * @memberof module:Mastermind
- * 
- * @param {object} game The current game state.
- * @param {string[]} code The code to validate.
+ * Returns whether a code is a valid sequence for the given game,
+ * i.e. an array of the correct length containing only allowed colours.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The game whose rules the code must satisfy.
+ * @param {Mastermind.Colour[]} code The code to check.
+ * @returns {boolean} Whether the code is valid.
+ */
+Mastermind.isValidCode = function (game, code) {
+    return (
+        Array.isArray(code) &&
+        code.length === game.codeLength &&
+        R.all((colour) => R.includes(colour, game.gColours), code)
+    );
+};
+
+/**
+ * Validates that a code is well formed, throwing a descriptive error if not.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The game whose rules the code must satisfy.
+ * @param {Mastermind.Colour[]} code The code to validate.
  * @throws {Error} If the code is not an array.
  * @throws {Error} If the code is not the correct length.
  * @throws {Error} If the code contains invalid colours.
  */
 Mastermind.validateCode = function (game, code) {
-
     if (!Array.isArray(code)) {
-        throw new Error("Secret code must be an array.");
+        throw new Error("Code must be an array.");
     }
-
     if (code.length !== game.codeLength) {
         throw new Error(
-            `Secret code must contain exactly ${game.codeLength} colours (repetition is allowed)`
+            "Code must contain exactly " + game.codeLength +
+            " colours (repetition is allowed)."
         );
     }
-
-    if (!R.all(
-        (colour) => R.includes(colour, game.gColours),
-        code
-    )) {
-        throw new Error("Invalid colour in secret code.");
+    if (!R.all((colour) => R.includes(colour, game.gColours), code)) {
+        throw new Error("Code contains an invalid colour.");
     }
 };
 
 /**
- * Validates and stores the secret code for the game.
- *
- * @memberof module:Mastermind
- * 
- * @param {object} game The current game state.
- * @param {string[]} code The secret code to store.
- * @throws {Error} If the secret code is invalid.
+ * Validates and stores the secret code, returning a new game.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The game to set the code for.
+ * @param {Mastermind.Colour[]} code The secret code to store.
+ * @returns {Mastermind.Game} A new game with the secret code set.
+ * @throws {Error} If the code is invalid.
  */
 Mastermind.setSecretCode = function (game, code) {
-
     Mastermind.validateCode(game, code);
-
-    return {
-        ...game,
-        secretCode: [...code]
-    };
+    return R.mergeRight(game, {secretCode: [...code]});
 };
 
 /**
- * validates a player's guess is in a valid form
- * @memberof module:Mastermind
- * @param {string[]} guess The player's guess.
- * @param {object} game The current game state.
- * @throws {Error} If guess is not an array
- * @throws {Error} If guess isn't the correct length
- * @throws {Error} If guess doesn't only contain valid colours
+ * Validates that a guess is well formed for the given game.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The game the guess is being made in.
+ * @param {Mastermind.Colour[]} guess The guess to validate.
+ * @throws {Error} If the guess is not a valid code.
  */
-Mastermind.validateGuess = function (game, guess) { //throws error if guess is invalid in form
+Mastermind.validateGuess = function (game, guess) {
     Mastermind.validateCode(game, guess);
 };
 
-/**
- * Scores a player's guess against the secret code.
- *
- * @memberof module:Mastermind
- * 
- * @param {string[]} secretCode The hidden code.
- * @param {string[]} guess The player's guess.
- * @returns {{blackPegs: number, whitePegs: number}} An object containing the number of black and white pegs.
- */
-Mastermind.scoreGuess = function (
-    game,
-    guess
-) {
+// For two equal length sequences, returns the multiset of colours that remain
+// once every exactly matching position has been removed from each.
+const non_matching_colours = function (secret, guess) {
+    const is_match = R.zipWith(R.equals, secret, guess);
+    const keep = (sequence) => sequence.filter(
+        (ignore, index) => !is_match[index]
+    );
+    return [keep(secret), keep(guess)];
+};
 
-    let numberBlackPegs = 0;
-    let numberWhitePegs = 0;
-
-    const remainingSecretCode = [];
-    const remainingGuess = [];
-
-    // First pass: Count and remove black pegs
-    for (let i = 0; i < game.secretCode.length; i += 1) {
-        if (guess[i] === game.secretCode[i]) {
-            numberBlackPegs += 1;
-        } else {
-            remainingSecretCode.push(game.secretCode[i]); //only non-black part of secret code remains
-            remainingGuess.push(guess[i]); //only non-black part of guess remains
-        }
-    }
-
-    // Second pass: Count white pegs
-    for (let i = 0; i < remainingGuess.length; i += 1) {
-        const colourIndex = remainingSecretCode.indexOf(remainingGuess[i]); //compares each term in remaining guesses to remaining secret code, setting value to -1 if not found
-
-        if (colourIndex !== -1) { // if a match is found at position i of remaining guess
-            numberWhitePegs += 1; // number of white pegs increases by 1
-            remainingSecretCode.splice(colourIndex, 1); // removes first matched colour from remaining secret code (to prevent double counting)
-        }
-    }
-
-    return {
-        blackPegs: numberBlackPegs,
-        whitePegs: numberWhitePegs
-    };
-
+// Counts, across all colours, how many appear in both multisets, taking the
+// smaller of the two tallies for each colour. This is the white peg count.
+const count_colour_overlap = function (remaining_secret, remaining_guess) {
+    const secret_counts = R.countBy(R.identity, remaining_secret);
+    const guess_counts = R.countBy(R.identity, remaining_guess);
+    return R.sum(R.values(R.mapObjIndexed(
+        (count, colour) => Math.min(count, secret_counts[colour] || 0),
+        guess_counts
+    )));
 };
 
 /**
- * Determines whether the guesser's guess wins the game.
- * Guess is winning if number of black pegs == code length
- *
- * @memberof module:Mastermind
- * 
- * @param {object} game The current game state.
- * @param {string[]} guess The player's guess.
- * @returns {boolean} True if the guess is winning, false otherwise.
+ * Scores a guess against the game's secret code.
+ * Black pegs count colours that are correct and in the correct position;
+ * white pegs count remaining colours that are present but misplaced.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The game holding the secret code.
+ * @param {Mastermind.Colour[]} guess The guess to score.
+ * @returns {Mastermind.Score} The black and white peg counts.
  */
-Mastermind.isWinningGuess = function (game, guess) {
-
-    const score = Mastermind.scoreGuess(
-        game,
+Mastermind.scoreGuess = function (game, guess) {
+    const secret = game.secretCode;
+    const blackPegs = R.count(
+        R.equals(true),
+        R.zipWith(R.equals, secret, guess)
+    );
+    const [remaining_secret, remaining_guess] = non_matching_colours(
+        secret,
         guess
     );
-
-    return score.blackPegs === game.codeLength;
+    return {
+        blackPegs,
+        whitePegs: count_colour_overlap(remaining_secret, remaining_guess)
+    };
 };
 
+/**
+ * Returns whether a guess wins the game,
+ * i.e. every peg is correct and in the correct position.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The game holding the secret code.
+ * @param {Mastermind.Colour[]} guess The guess to check.
+ * @returns {boolean} Whether the guess is a winning guess.
+ */
+Mastermind.isWinningGuess = function (game, guess) {
+    return Mastermind.scoreGuess(game, guess).blackPegs === game.codeLength;
+};
 
 /**
- * Determines whether the game has ended.
- *
- * The game is over if the codebreaker has guessed the
- * secret code or if no attempts remain.
- *
- * @memberof module:Mastermind
- * 
- * @param {object} game The current game state.
- * @returns {boolean} True if the game is over, false otherwise.
+ * Returns whether the game has ended,
+ * either because the code breaker has won or because no attempts remain.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The game to check.
+ * @returns {boolean} Whether the game is over.
  */
 Mastermind.isGameOver = function (game) {
-
-    return (
-        game.winner !== null ||
-        game.attemptsRemaining <= 0
-    );
+    return game.winner !== null || game.attemptsRemaining <= 0;
 };
 
 /**
- * Processes a player's guess and updates the game state.
- *
- * Validates the guess, scores it against the secret code,
- * stores the guess history, updates the remaining attempts,
- * and determines whether the game has ended.
- *
- * @memberof module:Mastermind
- * 
- * @param {object} game The current game state.
- * @param {string[]} guess The player's guess.
- * @returns {{blackPegs: number, whitePegs: number}}
- * An object containing the score for the guess.
+ * Scores a guess and returns the resulting game alongside its score.
+ * The guess is appended to the history, the attempt counters are advanced,
+ * and the winner is resolved if the game has ended.
+ * @memberof Mastermind
+ * @function
+ * @param {Mastermind.Game} game The current game.
+ * @param {Mastermind.Colour[]} guess The guess to play.
+ * @returns {{game: Mastermind.Game, score: Mastermind.Score}} The new game and
+ *     the score for this guess.
  * @throws {Error} If the game is already over.
  * @throws {Error} If the guess is invalid.
  */
 Mastermind.makeGuess = function (game, guess) {
-
     if (Mastermind.isGameOver(game)) {
         throw new Error("Game is already over.");
     }
-
     Mastermind.validateGuess(game, guess);
 
-    const score = Mastermind.scoreGuess(
-        game,
-        guess
-    );
-
-    let updatedGame = {
-        ...game,
-        guesses: [
-            ...game.guesses,
-            {
-                guess: [...guess],
-                score
-            }
-        ],
+    const score = Mastermind.scoreGuess(game, guess);
+    const played = R.mergeRight(game, {
         attemptsMade: game.attemptsMade + 1,
-        attemptsRemaining: game.attemptsRemaining - 1
-    };
-
-    if (score.blackPegs === game.codeLength) {
-
-        updatedGame = {
-            ...updatedGame,
-            winner: true
-        };
-
-    } else if (
-        updatedGame.attemptsRemaining <= 0
-    ) {
-
-        updatedGame = {
-            ...updatedGame,
-            winner: false
-        };
-
-    }
-
+        attemptsRemaining: game.attemptsRemaining - 1,
+        guesses: [...game.guesses, {guess: [...guess], score}]
+    });
+    const winner = (
+        score.blackPegs === game.codeLength
+        ? true
+        : (
+            played.attemptsRemaining <= 0
+            ? false
+            : null
+        )
+    );
     return {
-        game: updatedGame,
+        game: R.mergeRight(played, {winner}),
         score
     };
 };
 
 /**
  * Resets the game to its initial state.
- *
- * @memberof module:Mastermind
- * 
- * @returns {object} A new game state object.
+ * @memberof Mastermind
+ * @function
+ * @returns {Mastermind.Game} A new game state object.
  */
 Mastermind.resetGame = function () {
     return Mastermind.createGame();
