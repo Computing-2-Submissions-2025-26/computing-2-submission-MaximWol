@@ -1,3 +1,5 @@
+import R from "./ramda.js";
+
 /**
  * Mastermind game module.
  * @module Mastermind
@@ -21,7 +23,6 @@ Mastermind.createGame = function () { // initialises game state
         secretCode: [],
         guesses: [],
         winner: null, //True if guesser wins, false if guesser loses, null if game is ongoing
-        gameOver: false
     };
 
 };
@@ -37,19 +38,23 @@ Mastermind.createGame = function () { // initialises game state
  * @throws {Error} If the code is not the correct length.
  * @throws {Error} If the code contains invalid colours.
  */
-Mastermind.validateCode = function (game, code) { //throws error if code is invalid in form
+Mastermind.validateCode = function (game, code) {
+
     if (!Array.isArray(code)) {
-        throw new Error(`Secret code must be an array.`);
+        throw new Error("Secret code must be an array.");
     }
 
     if (code.length !== game.codeLength) {
-        throw new Error(`Secret code must contain exactly ${game.codeLength} colours (repetition is allowed)`);
+        throw new Error(
+            `Secret code must contain exactly ${game.codeLength} colours (repetition is allowed)`
+        );
     }
 
-    for (let i = 0; i < code.length; i += 1) {
-        if (!game.gColours.includes(code[i])) { // checks if each term in secret code is in the list of valid colours, throws an error if not
-            throw new Error(`Invalid colour in secret code.`);
-        }
+    if (!R.all(
+        (colour) => R.includes(colour, game.gColours),
+        code
+    )) {
+        throw new Error("Invalid colour in secret code.");
     }
 };
 
@@ -62,10 +67,14 @@ Mastermind.validateCode = function (game, code) { //throws error if code is inva
  * @param {string[]} code The secret code to store.
  * @throws {Error} If the secret code is invalid.
  */
-Mastermind.setSecretCode = function (game, code) { // sets the secret code for the game, throws error if code is invalid
-    Mastermind.validateCode(game, code); // validates proposed code
-    game.secretCode = code;// stores code in game
+Mastermind.setSecretCode = function (game, code) {
 
+    Mastermind.validateCode(game, code);
+
+    return {
+        ...game,
+        secretCode: [...code]
+    };
 };
 
 /**
@@ -91,7 +100,7 @@ Mastermind.validateGuess = function (game, guess) { //throws error if guess is i
  * @returns {{blackPegs: number, whitePegs: number}} An object containing the number of black and white pegs.
  */
 Mastermind.scoreGuess = function (
-    secretCode,
+    game,
     guess
 ) {
 
@@ -102,11 +111,11 @@ Mastermind.scoreGuess = function (
     const remainingGuess = [];
 
     // First pass: Count and remove black pegs
-    for (let i = 0; i < secretCode.length; i += 1) {
-        if (guess[i] === secretCode[i]) {
+    for (let i = 0; i < game.secretCode.length; i += 1) {
+        if (guess[i] === game.secretCode[i]) {
             numberBlackPegs += 1;
         } else {
-            remainingSecretCode.push(secretCode[i]); //only non-black part of secret code remains
+            remainingSecretCode.push(game.secretCode[i]); //only non-black part of secret code remains
             remainingGuess.push(guess[i]); //only non-black part of guess remains
         }
     }
@@ -138,11 +147,16 @@ Mastermind.scoreGuess = function (
  * @param {string[]} guess The player's guess.
  * @returns {boolean} True if the guess is winning, false otherwise.
  */
-Mastermind.isWinningGuess = function (game, guess) { // checks if guess is winning
-    const score = Mastermind.scoreGuess(game.secretCode, guess);
+Mastermind.isWinningGuess = function (game, guess) {
+
+    const score = Mastermind.scoreGuess(
+        game,
+        guess
+    );
 
     return score.blackPegs === game.codeLength;
 };
+
 
 /**
  * Determines whether the game has ended.
@@ -155,8 +169,12 @@ Mastermind.isWinningGuess = function (game, guess) { // checks if guess is winni
  * @param {object} game The current game state.
  * @returns {boolean} True if the game is over, false otherwise.
  */
-Mastermind.isGameOver = function (game) { // checks if game is over
-    return game.winner === true || game.attemptsRemaining <= 0; // if codebreaker has won or there are no attempts left the game is over
+Mastermind.isGameOver = function (game) {
+
+    return (
+        game.winner !== null ||
+        game.attemptsRemaining <= 0
+    );
 };
 
 /**
@@ -175,47 +193,54 @@ Mastermind.isGameOver = function (game) { // checks if game is over
  * @throws {Error} If the game is already over.
  * @throws {Error} If the guess is invalid.
  */
-Mastermind.makeGuess = function (game, guess) { // main function to make a guess, calls other functions to validate, score and check if game is over
+Mastermind.makeGuess = function (game, guess) {
 
-    // stop guesses after game has ended
     if (Mastermind.isGameOver(game)) {
-        throw new Error(`Game is already over.`);
+        throw new Error("Game is already over.");
     }
 
-    // validate guess, throws error if invalid
     Mastermind.validateGuess(game, guess);
 
-    // score guess
-    const score = Mastermind.scoreGuess(game.secretCode, guess);
+    const score = Mastermind.scoreGuess(
+        game,
+        guess
+    );
 
-    // store guess history
-    game.guesses.push({
-        guess,
+    let updatedGame = {
+        ...game,
+        guesses: [
+            ...game.guesses,
+            {
+                guess: [...guess],
+                score
+            }
+        ],
+        attemptsMade: game.attemptsMade + 1,
+        attemptsRemaining: game.attemptsRemaining - 1
+    };
+
+    if (score.blackPegs === game.codeLength) {
+
+        updatedGame = {
+            ...updatedGame,
+            winner: true
+        };
+
+    } else if (
+        updatedGame.attemptsRemaining <= 0
+    ) {
+
+        updatedGame = {
+            ...updatedGame,
+            winner: false
+        };
+
+    }
+
+    return {
+        game: updatedGame,
         score
-    });
-
-    // update attempts
-    game.attemptsMade += 1;
-    game.attemptsRemaining -= 1;
-
-    // update winner state
-    if (Mastermind.isWinningGuess(game, guess)) {
-        game.winner = true;
-    }
-
-    // check if game is over
-    if (Mastermind.isGameOver(game)) {
-        game.gameOver = true;
-    }
-
-    // if game is over and codebreaker hasn't won, they have lost
-    if (game.gameOver && game.winner !== true) {
-        game.winner = false;
-    }
-
-
-
-    return score;
+    };
 };
 
 /**

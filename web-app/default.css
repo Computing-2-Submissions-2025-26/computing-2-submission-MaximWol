@@ -1,3 +1,86 @@
+#top-bar {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+}
+
+#rules-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+#rules-overlay.hidden {
+    display: none;
+}
+
+#rules-panel {
+    background: #1a1a1a;
+    border: 2px solid white;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+}
+
+#rules-panel h2 {
+    margin-top: 0;
+}
+
+#rules-panel ul {
+    line-height: 1.6;
+    padding-left: 20px;
+}
+
+#rules-panel li {
+    margin-bottom: 10px;
+}
+
+/* Colourblind labels: centre text inside buttons and pegs */
+.colour-button,
+.peg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.colour-label {
+    display: none;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+body.colourblind .colour-label {
+    display: block;
+}
+
+.colour-button .colour-label {
+    font-size: 0.85rem;
+}
+
+.peg .colour-label {
+    font-size: 0.6rem;
+}
+
+/* Text contrast per colour */
+.yellow .colour-label,
+.white .colour-label {
+    color: black;
+}
+
+.red .colour-label,
+.green .colour-label,
+.blue .colour-label,
+.black .colour-label {
+    color: white;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -12,19 +95,11 @@ body {
 }
 
 .red-theme {
-    background: linear-gradient(
-        135deg,
-        #2b0000,
-        #550000
-    );
+    background: linear-gradient(135deg, #2b0000, #550000);
 }
 
 .blue-theme {
-    background: linear-gradient(
-        135deg,
-        #001133,
-        #003366
-    );
+    background: linear-gradient(135deg, #001133, #003366);
 }
 
 .transition-theme {
@@ -79,29 +154,12 @@ h1 {
     transform: scale(1.1);
 }
 
-.red {
-    background-color: red;
-}
-
-.green {
-    background-color: green;
-}
-
-.blue {
-    background-color: blue;
-}
-
-.yellow {
-    background-color: yellow;
-}
-
-.white {
-    background-color: white;
-}
-
-.black {
-    background-color: black;
-}
+.red { background-color: red; }
+.green { background-color: green; }
+.blue { background-color: blue; }
+.yellow { background-color: yellow; }
+.white { background-color: white; }
+.black { background-color: black; }
 
 .control-buttons {
     display: flex;
